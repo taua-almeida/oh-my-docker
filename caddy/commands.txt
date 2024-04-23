@@ -1,0 +1,15 @@
+// PULL DOWN THE CADDY IMAGE
+docker pull caddy
+
+// Run a container for index1.html on port 8001:
+docker run -p 8001:80 -v $PWD/index1.html:/usr/share/caddy/index.html caddy -d
+
+// Run a container for index2.html on port 8002:
+docker run -p 8002:80 -v -d $PWD/index2.html:/usr/share/caddy/index.html caddy -d
+
+// Let's create a custom bridge network called "caddytest".
+docker network create caddytest
+
+// run with load balancer
+docker run --network caddytest -p 8080:80 -v $PWD/Caddyfile:/etc/caddy/Caddyfile caddy
+

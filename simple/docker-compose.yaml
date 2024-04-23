@@ -1,0 +1,31 @@
+version: '3.9' # yaml version - not required
+
+volumes:
+  mysql_data: {}
+
+services:
+  mysql:
+    # can use a Dockerfile to build the image
+    image: mysql:8.0 # get from docker hub
+    volumes:
+      - mysql_data:/var/lib/mysql # path to mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+  wordpress:
+    depends_on:
+      - mysql
+    image: wordpress:latest 
+    ports:
+      - "69:69"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - ./wordpress:/var/www/html

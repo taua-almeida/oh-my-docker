@@ -1,0 +1,36 @@
+version: '3.7'
+
+network:
+  kong-net:
+    driver: bridge
+
+services:
+  kong-database:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: postgres:11.16
+    restart: always
+    networks:
+      - kong-net
+    environment:
+      POSTGRES_USER-${POSTGRES_USER}
+      POSTGRES_DB-${POSTGRES_DB}
+      POSTGRES_PASSWORD-${POSTGRES_PASSWORD}
+  kong-migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile-kong-migrations
+    image: kong:lastest
+    entrypoint: sh -c "sleep 10 kong migrations bootstrap -v"
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_DATABASE: ${POSTGRES_DB}
+      KONG_PG_USER: ${POSTGRES_USER}
+      KONG_PG_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - kong-database
+    networks:
+      - kong-net
+    restart: on-failure
